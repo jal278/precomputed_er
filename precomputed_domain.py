@@ -22,6 +22,8 @@ import pickle
 from scipy.spatial import cKDTree as kd
 from numba import jit,jitclass
 
+DIR = "/home/joel.lehman/evodata"
+
 #kdtree calculation for fast novelty search evaluation
 @jit
 def evalNovKDTree(data,archive):
@@ -204,7 +206,7 @@ class metrics:
    return -self.rarity[self.domain.data["behaviorhash"][self.domain.to_idx(ind)]]  
 
 class precomputed_maze_domain:
-  def __init__(self,maze="hard",storage_directory="~/evodata/logs",mmap=False):
+  def __init__(self,maze="hard",storage_directory=DIR,mmap=False):
     self.maze= maze
     self.storage_directory = storage_directory
     self.data = self.read_in( ("%s/storage_"%storage_directory)+maze+".dat" )
@@ -300,7 +302,7 @@ class precomputed_maze_domain:
     self.evo[k]= np.load(evo_file)
 
   def everywhere_evolvability_calculate(self):
-   if self.evo_everywhere!=None:
+   if type(self.evo_everywhere)!=type(None):
        return
 
    evo_file = self.fname+".evoall.npy"
@@ -475,7 +477,7 @@ class precomputed_maze_individual:
 
 class precomputed_domain_interface():
  def __init__(self,path="logs/storage.dat"):
-   self.precompute = precomputed_maze_domain(path,storage_directory="./logs")
+   self.precompute = precomputed_maze_domain(path,storage_directory=path)
    self.generator = lambda:precomputed_maze_individual(self.precompute)
    self.get_behavior = lambda x:x.behavior
    self.get_fitness = lambda x:x.fitness 
@@ -537,7 +539,7 @@ if __name__=='__main__':
  #set_seeds(1003)
 
  maze="hard"
- domain_total = precomputed_maze_domain(maze,storage_directory="logs/",mmap=True)
+ domain_total = precomputed_maze_domain(maze,storage_directory=DIR,mmap=True)
 
  compute_evolvability=True
  if compute_evolvability:
