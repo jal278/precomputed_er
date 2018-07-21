@@ -5,6 +5,12 @@ Python wrapper for the maze navigation evolutionary robotics domain common acros
 
 The program is built using SCons (http://www.scons.org/)
 
+Precomputed Data Files
+----------------------
+
+Hard maze data file: https://s3.amazonaws.com/precomputed-maze/hard_maze.zip
+Medium maze data file: https://s3.amazonaws.com/precomputed-maze/medium_maze.zip
+
 Building
 --------
 
