@@ -44,7 +44,8 @@ def render(search,domain,screen,background):
 
 
 if __name__=='__main__': 
- maze = 'medium'
+ maze = 'hard'
+ #maze = 'medium'
  search_type = 'fit'
 
  #render flag

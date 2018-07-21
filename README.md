@@ -27,4 +27,6 @@ Quick-start
 
 Download one or both of the precomputed maze domain files (hard_maze.zip and/or medium_maze.zip) and unzip them into the logs subdirectory.
 
-Then you should be able to run demo.py
+Running demo.py by default will initiate a run of fitness-based search in the medium maze.
+
+The file demo_notebook.ipynb demonstrates some basic analysis of the data. 
