@@ -22,6 +22,7 @@ disp=False
 
 #display depends upon pygame
 if disp:
+ #window size in pixels
  SZX=SZY=400
  import pygame
  from pygame.locals import *
@@ -39,21 +40,30 @@ def render(search,domain):
  pop = search.population
  novelty = search.novelty
  archive = search.archive
+
+ #erase screen
  screen.blit(background, (0, 0))
 
+ #for scaling color (which indicates performance)
  mn_fit = search.fitness.min()
  mx_fit = search.fitness.max()
 
  for idx,robot in enumerate(pop):
   x,y = domain.norm_behavior(robot)
   
+  #convert to screen coords
   x=x*SZX
   y=y*SZY
   rect=(int(x),int(y),5,5)
+
+  #calculate color based on performance
   col = (search.fitness[idx]-mn_fit)/(mx_fit-mn_fit)*255.0
   col = int(col)
+
+  #draw to screen
   pygame.draw.rect(screen,col,rect,0)
 
+ #if doing novelty search, also draw archive
  if novelty:
   for robot in archive:
    x,y = robot/300
@@ -88,8 +98,10 @@ class search:
   self.evo_everywhere=False
   self.evo_steps=1
 
+  #instrument search through metrics class in precomputed_domain.py
   self.metrics = metrics(domain)
 
+  #what search heuristic to use
   if search_mode=='fitness':
    pass
   if search_mode=='rarity':
@@ -130,12 +142,14 @@ class search:
   if self.novelty:
    self.map_fitness = lambda x,y:self.domain.map_novelty(x,y)
 
+  #ground-truth fitness (i.e. prespecified domain fitness)
   self.map_gt_fitness = lambda x,y:self.domain.map_fitness(x)
 
   self.mutation_rate = mutation_rate
   self.drift = drift
   self.best_gt = -1e10
 
+  #fitness uniform selection and tournament selection 
   if self.fuss:
       self.selection_mechanism = lambda x:self.select_fuss(x)
   else:
@@ -145,10 +159,11 @@ class search:
   if log_evolvability:
    self.evolvability = self.map_evolvability(self.population)
 
-
+ #map some metric over the population
  def map_general(self,measure,population):
       return np.array([measure(x) for x in population])
 
+ #fitness uniform selection
  def select_fuss(self,pop):
      rnd_fit = random.uniform(self.min_fit,self.max_fit)
      abs_dif = self.fitness - rnd_fit
@@ -158,12 +173,7 @@ class search:
 
      return self.domain.clone(pop[closest_idx])
 
- def select_diverse(self,pop):
-   offs = np.random.randint(0,self.pop_size,4)
-   dist = distance_matrix(np.take(pop,offs)).sum(0)
-   off = offs[np.argmax(dist)]
-   return self.domain.clone(pop[off])
-
+ #tournament selection
  def select_tourn(self,pop):
    offs = np.random.randint(0,self.pop_size,self.tourn_size)
    fits = self.fitness[offs]
@@ -173,6 +183,7 @@ class search:
        off = offs[np.argmax(fits)]
    return self.domain.clone(pop[off])
 
+ #create new population
  def select(self,pop):
   elites=self.elites
   champ_idx = np.argmax(self.fitness)
@@ -181,16 +192,14 @@ class search:
   #elitism
   for _ in xrange(elites):
    newpop.append(self.domain.clone(pop[champ_idx]))
-  
+ 
+  #store min and max fitness 
   self.min_fit = self.fitness.min()
   self.max_fit = self.fitness.max()
 
-  diversity_pressure=self.diversity_pressure 
+  #rest of population is offspring from previous pop
   for _ in xrange(self.pop_size-elites):
-   if random.random()<diversity_pressure:
-    child = self.select_diverse(pop)
-   else:
-    child = self.selection_mechanism(pop)
+   child = self.selection_mechanism(pop)
 
    if random.random()<self.mutation_rate:
     child = self.domain.mutate(child) 
@@ -199,12 +208,14 @@ class search:
 
   return newpop
 
+ #simple hill-climbing method
  def hillclimb(self,eval_budget,shadow=False):
   champ = self.population[0]
   champ_fitness = self.map_fitness([champ],None)[0]
   orig_fitness = champ_fitness
   selections = 0
   solved=False
+
   for _ in xrange(eval_budget):
    offspring = self.domain.clone(champ)
    offspring = self.domain.mutate(offspring)
@@ -225,12 +236,14 @@ class search:
        selections+=1
 
   return orig_fitness,champ_fitness,selections,solved
-  
+
+ #do one epoch of evolution  
  def epoch(self,count_behaviors=True):
   self.epoch_count+=1
   self.evals+=self.pop_size
   new_population = self.select(self.population)
 
+  #add one individual to archive each epoch for NS
   for _ in xrange(1):
    if self.archive_ptr>=MAX_ARCHIVE_SIZE:
     self.archive_ptr = self.archive_ptr % MAX_ARCHIVE_SIZE
@@ -257,9 +270,9 @@ class search:
    self.solved=True
    return True 
 
-  #print distance_matrix(self.population).sum()
-
   #print self.evolvability.max(),self.evolvability.mean(),self.evolvability.min() 
+  
+  #keep track of overall best fitnes individual
   if self.best_gt < self.gt_fitness.max():
    self.best_gt = self.gt_fitness.max()
    print self.epoch_count,self.best_gt
@@ -372,32 +385,4 @@ def repeat_search(generator,times,seeds=None,gens=250):
       solved.append(False)
       evals.append(-1)
  return solved,evals
-
-if __name__=='__main__': 
- maze = 'medium'
- domain = precomputed_maze_domain(maze,storage_directory="logs/",mmap=True)
-
- rarity = lambda : search(domain,search_mode="rarity",pop_size=500,tourn_size=2)
- evo1 = lambda : search(domain,search_mode="evolvability1",pop_size=500)
- evo2 = lambda : search(domain,search_mode="evolvability2",pop_size=500)
- evo3 = lambda : search(domain,search_mode="evolvability3",pop_size=500)
- evo4 = lambda : search(domain,search_mode="evolvability4",pop_size=500)
- evo_ev = lambda : search(domain,search_mode='evolvability_everywhere',pop_size=500)
-
- nov = lambda : search(domain,search_mode="novelty",tourn_size=2,pop_size=500) #was 0.25
- fit = lambda : search(domain,tourn_size=2,pop_size=500)
- rnd = lambda : search(domain,tourn_size=3,pop_size=500,drift=1.0,elites=0)
- 
- search = rarity()
-
- for _ in xrange(1000):
-  if _%100==0:
-   print _*search.pop_size
-  sol = search.epoch()
-  if sol:
-    print "solved" 
-    break
-  if(disp):
-    render(search,domain)
- print search.evals
 

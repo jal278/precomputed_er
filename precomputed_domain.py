@@ -22,7 +22,8 @@ import pickle
 from scipy.spatial import cKDTree as kd
 from numba import jit,jitclass
 
-DIR = "/home/joel.lehman/evodata"
+#default directory for data 
+DIR = "logs/"
 
 #kdtree calculation for fast novelty search evaluation
 @jit
@@ -433,9 +434,10 @@ class precomputed_maze_domain:
    x,y = self.get_data(descriptor=descriptor)[:2]
    return x,y
 
+  #return behavior characterization normalized between 0 and 1
   def norm_behavior(self,descriptor):
    idx = self.to_idx(descriptor)
-   x,y = self.data['x'][idx],self.data['y'][idx] #get_data(descriptor=descriptor)[:2]
+   x,y = self.data['x'][idx],self.data['y'][idx] 
    return x/300.0,y/300.0
 
   def map_solution(self,population):
