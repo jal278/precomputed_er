@@ -8,32 +8,23 @@ The program is built using SCons (http://www.scons.org/)
 Precomputed Data Files
 ----------------------
 
-Hard maze data file: https://s3.amazonaws.com/precomputed-maze/hard_maze.zip
-Medium maze data file: https://s3.amazonaws.com/precomputed-maze/medium_maze.zip
+You'll need to download these to run the maze experiments.
 
-Building
---------
+* Hard maze data file: https://s3.amazonaws.com/precomputed-maze/hard_maze.zip
+* Medium maze data file: https://s3.amazonaws.com/precomputed-maze/medium_maze.zip
 
-Before you build, the following dependencies should be installed:
-* python2.x developer libraries and includes (to build python wrapper)
-* wxWidgets developer libraries and includes (to build visualizer)
+Dependencies
+------------
 
 Python dependencies:
 * Numpy
 * Numba (http://numba.pydata.org/)
 * Scipy 
 
-After these dependencies are installed, building the program should (ideally) be as simple as executing scons in the working directory (note: only tested on Linux but I don't believe anything is linux-specific).
 
 Quick-start
 -----------
 
-To run the maze navigation experiment from "Evolvability is Inevitable":
+Download one or both of the precomputed maze domain files (hard_maze.zip and/or medium_maze.zip) and unzip them into the logs subdirectory.
 
-    mazesim -m hard_maze_list.txt --passive -o [output directory]
-
-There is also a visualizer to see what the maze looks like and how a particular genome solves the maze (which can be built through makeVisualizer.sh). Note that the visualizer depends upon wxWidgets to build though. Running the visualizer takes the following format:
-
-    maze <mazefile> <brainfile>
-
-test\_neuroevolution.py showcases the python interface
+Then you should be able to run demo.py

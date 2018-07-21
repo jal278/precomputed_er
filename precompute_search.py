@@ -15,64 +15,7 @@
 
 from precomputed_domain import *
 import math
-
-#global display flag
-#turn on to visualize search
-disp=False
-
-#display depends upon pygame
-if disp:
- #window size in pixels
- SZX=SZY=400
- import pygame
- from pygame.locals import *
- pygame.init()
- pygame.display.set_caption('Viz')
- screen =pygame.display.set_mode((SZX,SZY))
- 
- background = pygame.Surface(screen.get_size())
- background = background.convert()
- background.fill((250, 250, 250,255))
-
-#render function
-def render(search,domain):
- global screen,background
- pop = search.population
- novelty = search.novelty
- archive = search.archive
-
- #erase screen
- screen.blit(background, (0, 0))
-
- #for scaling color (which indicates performance)
- mn_fit = search.fitness.min()
- mx_fit = search.fitness.max()
-
- for idx,robot in enumerate(pop):
-  x,y = domain.norm_behavior(robot)
-  
-  #convert to screen coords
-  x=x*SZX
-  y=y*SZY
-  rect=(int(x),int(y),5,5)
-
-  #calculate color based on performance
-  col = (search.fitness[idx]-mn_fit)/(mx_fit-mn_fit)*255.0
-  col = int(col)
-
-  #draw to screen
-  pygame.draw.rect(screen,col,rect,0)
-
- #if doing novelty search, also draw archive
- if novelty:
-  for robot in archive:
-   x,y = robot/300
-   x=x*SZX
-   y=y*SZY
-   rect=(int(x),int(y),5,5)
-   pygame.draw.rect(screen,(0,255,0),rect,0)
-
- pygame.display.flip()
+from pdb import set_trace as bb
 
 #general search class 
 MAX_ARCHIVE_SIZE = 1000

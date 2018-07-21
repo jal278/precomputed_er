@@ -181,12 +181,13 @@ def _get_data(descriptor,data):
 
 #class to hold metrics
 class metrics:
-  def __init__(self,domain):
+  def __init__(self,domain,storage_directory=DIR):
       self.domain = domain
+      self.storage_directory = storage_directory
       self.rarity()
 
   def rarity(self):
-   rarity_file = "rarity_%s.pkl"%self.domain.maze
+   rarity_file = self.storage_directory+"rarity_%s.pkl"%self.domain.maze
    print rarity_file
    if os.path.isfile(rarity_file):
     print "rarity cached..."
