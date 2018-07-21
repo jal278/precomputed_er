@@ -41,6 +41,8 @@ def render(search,domain,screen,background):
 
  pygame.display.flip()
 
+
+
 if __name__=='__main__': 
  maze = 'medium'
  search_type = 'fit'
@@ -86,7 +88,10 @@ if __name__=='__main__':
  for _ in xrange(1000):
   if _%100==0:
    print search.pop_size
+
+  #is the maze solved?
   sol = search.epoch()
+
   if sol:
     print "solved" 
     break
